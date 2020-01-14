@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext, useReducer, useEffect } from "react";
+import TodosContext from "./context";
+import todosReducer from "./reducer";
+import TodoList from "./components/TodoList";
+import TodoForm from "./components/TodoForm";
+import useAPI from "./useAPI";
 
-function App() {
+const App = () => {
+  const initialState = useContext(TodosContext);
+  const [state, dispatch] = useReducer(todosReducer, initialState);
+  const savedTodos = useAPI("https://hooks-api.davidmateo.now.sh/todos");
+
+  useEffect(() => {
+    dispatch({
+      type: "GET_TODOS",
+      payload: savedTodos,
+    });
+  }, [savedTodos]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <TodosContext.Provider value={{ state, dispatch }}>
+      <TodoForm />
+      <TodoList />
+    </TodosContext.Provider>
   );
-}
-
+};
 export default App;
